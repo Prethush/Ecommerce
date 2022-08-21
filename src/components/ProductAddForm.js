@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { v4 as uuid } from "uuid";
+import { useNavigate } from "react-router-dom";
 
 let initialState = {
   name: "",
@@ -9,15 +11,22 @@ let initialState = {
   category: "",
   ratings: "",
 };
+
+// regex to validate an image url
 const IMG_REGEX = /\.(jpg|jpeg|png|webp|avif|gif|svg)$/;
 
 function ProductAddForm() {
+  const unique_id = uuid();
+  const navigate = useNavigate();
+
   // form fields
   const [formVal, setFormVal] = useState(initialState);
-  // product array to store all the product details
+
+  // state variables
   const [prodArr, setProdArr] = useState([]);
   const [validImgUrl, setValidImgUrl] = useState(false);
   const [validRatings, setValidRatings] = useState(false);
+
   let { name, image, desc, price, category, ratings } = formVal;
 
   useEffect(() => {
@@ -29,21 +38,18 @@ function ProductAddForm() {
   // storing the values of form fields to state and checking some validation
   const handleChange = (e) => {
     let { name, value } = e.target;
-    if (name === "name") {
-      value = value.trim();
-    }
     if (name === "image") {
+      value = e.target.files[0].name;
       const imgResult = IMG_REGEX.test(value);
       if (!imgResult) {
         toast.error("Invalid image file");
       }
       setValidImgUrl(imgResult);
     }
-
     if (name === "ratings") {
-      const ratingsResult = value <= 10;
-      if (ratingsResult) {
-        toast.error("Ratings should be less than or equal to 10");
+      const ratingsResult = value <= 5;
+      if (!ratingsResult) {
+        toast.error("Ratings should be less than or equal to 5");
       }
       setValidRatings(ratingsResult);
     }
@@ -53,11 +59,17 @@ function ProductAddForm() {
   // add product to the local storage
   const addProduct = (e) => {
     e.preventDefault();
-    prodArr.push(formVal);
+    name = name.trim();
+    const small_id = unique_id.slice(0, 8);
+    let newFormVal = { ...formVal };
+    newFormVal.id = small_id;
+    prodArr.push(newFormVal);
     localStorage.setItem("prodArr", JSON.stringify(prodArr));
     setFormVal(initialState);
+    navigate("/");
     toast.success(`${name} is added`);
   };
+
   return (
     <section className="vh-100 bg-image">
       <div className="mask d-flex align-items-center h-100 gradient-custom-3">
@@ -94,7 +106,6 @@ function ProductAddForm() {
                         id="form3Example2cg"
                         className="form-control form-control-lg"
                         name="image"
-                        value={image}
                         onChange={handleChange}
                       />
                     </div>
