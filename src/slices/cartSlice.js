@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const prodArr = JSON.parse(localStorage.getItem("prodArr"));
 const cartArr = JSON.parse(localStorage.getItem("cartArr")) || [];
 const initialState = {
   cart: cartArr,
@@ -8,10 +7,13 @@ const initialState = {
 
 // reducer to add a product to cart
 const handleAddToCart = (state, action) => {
+  const prodArr = JSON.parse(localStorage.getItem("prodArr"));
   const id = action.payload;
+  console.log(id, "id");
   let arr = [...state.cart];
   const index = arr.findIndex((ar) => ar.id === id);
   const prod = prodArr.find((ar) => ar.id === id);
+  console.log(prodArr, "prod");
   if (index === -1) {
     arr.push({
       name: prod.name,

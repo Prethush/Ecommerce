@@ -40,9 +40,9 @@ function Header() {
                   alt="shppoingCartLogo"
                   style={{ height: "30px" }}
                 />
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                   {cart.length}
-                  <span class="visually-hidden">unread messages</span>
+                  <span className="visually-hidden">unread messages</span>
                 </span>
               </div>
             </Link>
@@ -53,9 +53,9 @@ function Header() {
                   alt="wishListIcon"
                   style={{ height: "30px" }}
                 />
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                   {wishList.length}
-                  <span class="visually-hidden">unread messages</span>
+                  <span className="visually-hidden">unread messages</span>
                 </span>
               </div>
             </Link>

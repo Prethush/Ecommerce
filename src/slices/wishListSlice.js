@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const prodArr = JSON.parse(localStorage.getItem("prodArr"));
 const wishlistArr = JSON.parse(localStorage.getItem("wishlistArr")) || [];
 
 // initial state
@@ -11,10 +10,10 @@ const initialState = {
 
 // reducer to add a product to the wishlist
 const handleAddToWishlist = (state, action) => {
+  const prodArr = JSON.parse(localStorage.getItem("prodArr"));
   const id = action.payload;
   let arr = [...state.wishList];
   const index = arr.findIndex((ar) => ar.id === id);
-  console.log(arr, "arr");
   const prod = prodArr.find((ar) => ar.id === id);
   if (index === -1) {
     arr.push({
@@ -39,7 +38,6 @@ const resetMessage = (state, action) => {
 // reducer to delete a product from the wishlist
 const handleDeleteFromWishlist = (state, action) => {
   const id = action.payload;
-  console.log(id, "id");
   const arr = [...state.wishList];
   const index = arr.findIndex((ar) => ar.id === id);
   arr.splice(index, 1);
@@ -47,7 +45,7 @@ const handleDeleteFromWishlist = (state, action) => {
   state.wishList = JSON.parse(localStorage.getItem("wishlistArr"));
 };
 
-const cartSlice = createSlice({
+const wishListSlice = createSlice({
   name: "wishlist",
   initialState,
   reducers: {
@@ -57,6 +55,7 @@ const cartSlice = createSlice({
   },
 });
 
-const { reducer } = cartSlice;
-export const { addToWishlist, deleteFromWishlist, reset } = cartSlice.actions;
+const { reducer } = wishListSlice;
+export const { addToWishlist, deleteFromWishlist, reset } =
+  wishListSlice.actions;
 export default reducer;

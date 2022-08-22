@@ -6,45 +6,46 @@ import { addToWishlist, reset } from "../slices/wishListSlice";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { Rating } from "react-simple-star-rating";
+import { deleteProd } from "../slices/productSlice";
 
 function Home() {
+  const { prodArr } = useSelector((state) => state.product);
   const [productArr, setProductArr] = useState([]);
   const { message } = useSelector((state) => state.wishList);
   const [value, setValue] = useState("");
   const [filter, setFilter] = useState("");
   const dispatch = useDispatch();
 
-  // while mounting the component we are fetching product array from localstorage and assign the value to prodArr state variable if there is no product array prodArr will be an empty array
+  // while the component mounts we are fetching the values of the product array from local storage and set that value productArr state variable
+
   useEffect(() => {
-    let arr = JSON.parse(localStorage.getItem("prodArr")) || [];
-    if (value.length) {
-      arr = arr.filter(
-        (a) =>
-          a.name.toLowerCase().startsWith(value.toLocaleLowerCase()) ||
-          a.category.toLowerCase().startsWith(value.toLowerCase())
-      );
-    }
-    if (filter.length) {
-      if (filter === "price-asc") {
-        arr = arr.sort((a, b) => +a.price - +b.price);
-      } else if (filter === "price-desc") {
-        arr = arr.sort((a, b) => +b.price - +a.price);
-      } else {
-        arr = arr.sort((a, b) => +b.ratings - +a.ratings);
+    if (prodArr) {
+      let arr = [...prodArr];
+      if (value.length) {
+        arr = arr.filter(
+          (a) =>
+            a.name.toLowerCase().startsWith(value.toLocaleLowerCase()) ||
+            a.category.toLowerCase().startsWith(value.toLowerCase())
+        );
       }
+      if (filter.length) {
+        if (filter === "price-asc") {
+          arr = arr.sort((a, b) => +a.price - +b.price);
+        } else if (filter === "price-desc") {
+          arr = arr.sort((a, b) => +b.price - +a.price);
+        } else {
+          arr = arr.sort((a, b) => +b.ratings - +a.ratings);
+        }
+      }
+      setProductArr(arr);
     }
-    setProductArr(arr);
-  }, [value, filter]);
+  }, [prodArr, value, filter]);
 
   // to delete a particular product
   const handleDelete = (id) => {
-    const index = productArr.findIndex((prod) => prod.id === id);
-    const arr = [...productArr];
-    arr.splice(index, 1);
-    localStorage.setItem("prodArr", JSON.stringify(arr));
-    setProductArr(arr);
+    dispatch(deleteProd(id));
   };
-  
+
   // this useeffect is used whenever we are trying to add a product to wishlist which is already present in the wishlist we show this message
   useEffect(() => {
     if (message.length) {
@@ -55,7 +56,6 @@ function Home() {
 
   // add a product to wishlist
   const handleAddToWishlist = (id) => {
-    console.log(id, "id");
     dispatch(addToWishlist(id));
   };
 

@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Layout from "../pages/Layout";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { editProd, reset } from "../slices/productSlice";
 
 let initialState = {
   name: "",
@@ -18,23 +20,23 @@ const IMG_REGEX = /\.(jpg|jpeg|png|webp|avif|gif|svg)$/;
 
 function EditProduct() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { prodArr, message } = useSelector((state) => state.product);
 
   // state variables
   const [formVal, setFormVal] = useState(initialState);
-  const [prodArr, setProdArr] = useState([]);
   const [validImgUrl, setValidImgUrl] = useState(true);
   const [validRatings, setValidRatings] = useState(true);
 
-  const navigate = useNavigate();
   let { name, image, desc, category, ratings, price } = formVal;
 
   useEffect(() => {
-    // when this component mounts it will fetch this particular product details from local storage
-    const products = JSON.parse(localStorage.getItem("prodArr"));
-    const index = products.findIndex((prod) => prod.id === id);
-    setFormVal(products[index]);
-    setProdArr(products);
-  }, [id]);
+    if (prodArr) {
+      const index = prodArr.findIndex((prod) => prod.id === id);
+      setFormVal(prodArr[index]);
+    }
+  }, [id, prodArr]);
 
   // storing the values of form fields to state and checking some validation
   const handleChange = (e) => {
@@ -57,15 +59,18 @@ function EditProduct() {
     setFormVal({ ...formVal, [name]: value });
   };
 
+  useEffect(() => {
+    if (message.length) {
+      toast.success(message);
+      dispatch(reset());
+      navigate("/");
+    }
+  });
   // store the updated product to localstorage
   const editProduct = (e) => {
     e.preventDefault();
     name = name.trim();
-    let index = prodArr.findIndex((prod) => prod.id === id);
-    prodArr[index] = formVal;
-    localStorage.setItem("prodArr", JSON.stringify(prodArr));
-    navigate("/");
-    toast.success(`${name} is updated`);
+    dispatch(editProd({ product: formVal, id }));
   };
 
   return (
